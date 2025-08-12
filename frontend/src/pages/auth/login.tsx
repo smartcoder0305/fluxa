@@ -1,26 +1,26 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react'
+import authService from '@/services/authService'
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError('')
     
     try {
-      // TODO: Implement login logic
-      console.log('Login attempt:', { email, password })
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await authService.login({ email, password })
       navigate('/dashboard')
     } catch (error) {
-      console.error('Login failed:', error)
+      setError(error instanceof Error ? error.message : 'Login failed')
     } finally {
       setIsLoading(false)
     }
@@ -28,13 +28,18 @@ const Login: React.FC = () => {
 
   const handleGoogleLogin = async () => {
     setIsLoading(true)
+    setError('')
+    
     try {
-      // TODO: Implement Google OAuth
-      console.log('Google login attempt')
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      navigate('/dashboard')
+      // TODO: Implement Google OAuth flow
+      // This would typically involve:
+      // 1. Opening Google OAuth popup
+      // 2. Getting the ID token from Google
+      // 3. Sending it to our backend
+      console.log('Google login attempt - implement OAuth flow')
+      setError('Google OAuth not yet implemented')
     } catch (error) {
-      console.error('Google login failed:', error)
+      setError(error instanceof Error ? error.message : 'Google login failed')
     } finally {
       setIsLoading(false)
     }
@@ -102,6 +107,13 @@ const Login: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-900 text-center mb-8">
             Welcome to Fluxa
           </h1>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
 
           {/* Google Login Button */}
           <button

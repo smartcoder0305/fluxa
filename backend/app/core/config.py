@@ -32,6 +32,9 @@ class Settings(BaseSettings):
         "enterprise": "price_enterprise_monthly"
     }
     
+    # Google OAuth - required for Google login
+    GOOGLE_CLIENT_ID: str
+    
     # Email configuration - optional but configurable
     SMTP_TLS: bool = True
     SMTP_PORT: int = 587

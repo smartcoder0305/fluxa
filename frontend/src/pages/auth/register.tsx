@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react'
+import authService from '@/services/authService'
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +15,7 @@ const Register: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [apiError, setApiError] = useState('')
   const navigate = useNavigate()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,6 +24,10 @@ const Register: React.FC = () => {
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }))
+    }
+    // Clear API error when user starts typing
+    if (apiError) {
+      setApiError('')
     }
   }
 
@@ -64,15 +70,19 @@ const Register: React.FC = () => {
     }
 
     setIsLoading(true)
+    setApiError('')
     
     try {
-      // TODO: Implement registration logic
-      console.log('Registration attempt:', formData)
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await authService.register({
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+        confirm_password: formData.confirmPassword
+      })
       navigate('/dashboard')
     } catch (error) {
-      console.error('Registration failed:', error)
+      setApiError(error instanceof Error ? error.message : 'Registration failed')
     } finally {
       setIsLoading(false)
     }
@@ -80,13 +90,18 @@ const Register: React.FC = () => {
 
   const handleGoogleSignup = async () => {
     setIsLoading(true)
+    setApiError('')
+    
     try {
-      // TODO: Implement Google OAuth
-      console.log('Google signup attempt')
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      navigate('/dashboard')
+      // TODO: Implement Google OAuth flow
+      // This would typically involve:
+      // 1. Opening Google OAuth popup
+      // 2. Getting the ID token from Google
+      // 3. Sending it to our backend
+      console.log('Google signup attempt - implement OAuth flow')
+      setApiError('Google OAuth not yet implemented')
     } catch (error) {
-      console.error('Google signup failed:', error)
+      setApiError(error instanceof Error ? error.message : 'Google signup failed')
     } finally {
       setIsLoading(false)
     }
@@ -154,6 +169,13 @@ const Register: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-900 text-center mb-8">
             Create <span className="bg-red-100 text-red-600 px-2 py-1 rounded">your</span> account
           </h1>
+
+          {/* API Error Message */}
+          {apiError && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-sm">{apiError}</p>
+            </div>
+          )}
 
           {/* Google Signup Button */}
           <button
