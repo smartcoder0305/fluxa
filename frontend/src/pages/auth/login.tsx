@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react'
+import { useGoogleLogin } from '@react-oauth/google'
 import authService from '@/services/authService'
 
 const Login: React.FC = () => {
@@ -26,23 +27,36 @@ const Login: React.FC = () => {
     }
   }
 
-  const handleGoogleLogin = async () => {
-    setIsLoading(true)
-    setError('')
-    
-    try {
-      // TODO: Implement Google OAuth flow
-      // This would typically involve:
-      // 1. Opening Google OAuth popup
-      // 2. Getting the ID token from Google
-      // 3. Sending it to our backend
-      console.log('Google login attempt - implement OAuth flow')
-      setError('Google OAuth not yet implemented')
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Google login failed')
-    } finally {
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (response) => {
+      setIsLoading(true)
+      setError('')
+      
+      try {
+        // Get the access token from Google
+        const accessToken = response.access_token
+        
+        // Call our backend with the Google OAuth data
+        await authService.googleOAuth({ 
+          id_token: accessToken, 
+          access_token: accessToken 
+        })
+        
+        navigate('/dashboard')
+      } catch (error) {
+        setError(error instanceof Error ? error.message : 'Google login failed')
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    onError: () => {
+      setError('Google login failed. Please try again.')
       setIsLoading(false)
     }
+  })
+
+  const handleGoogleLogin = () => {
+    googleLogin()
   }
 
   const testimonials = [
