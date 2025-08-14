@@ -1,0 +1,86 @@
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Docker
+.dockerignore
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Backup files
+*.bak
+*.backup
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Cache directories
+.cache/
+cache/
+
+# Build artifacts
+build/
+dist/
+target/
+
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Coverage reports
+coverage/
+.coverage
+*.cover
+htmlcov/
+
+# Test results
+.pytest_cache/
+.tox/
+.nox/
+nosetests.xml
+coverage.xml
+
+# Package files
+*.egg-info/
+*.egg
+*.whl
+*.tar.gz
+
+# Local development
+local/
+local_*
