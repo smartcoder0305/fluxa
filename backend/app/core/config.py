@@ -1,4 +1,4 @@
-from typing import List, Union, Optional
+from typing import List, Union, Optional, Dict
 from pydantic import field_validator
 from pydantic_settings import BaseSettings
 
@@ -28,11 +28,29 @@ class Settings(BaseSettings):
     # Stripe - required for payment functionality
     STRIPE_SECRET_KEY: str
     STRIPE_WEBHOOK_SECRET: str
-    STRIPE_PRICE_IDS: dict = {
-        "basic": "price_basic_monthly",
-        "pro": "price_pro_monthly",
-        "enterprise": "price_enterprise_monthly"
-    }
+    STRIPE_PRICE_IDS: str = '{"basic": "price_basic_monthly", "pro": "price_pro_monthly", "enterprise": "price_enterprise_monthly"}'
+
+    @field_validator("STRIPE_PRICE_IDS", mode="before")
+    @classmethod
+    def parse_stripe_price_ids(cls, v: Union[str, Dict]) -> Dict:
+        if isinstance(v, dict):
+            return v
+        if isinstance(v, str):
+            try:
+                import json
+                return json.loads(v)
+            except json.JSONDecodeError:
+                # Return default if parsing fails
+                return {
+                    "basic": "price_basic_monthly",
+                    "pro": "price_pro_monthly", 
+                    "enterprise": "price_enterprise_monthly"
+                }
+        return {
+            "basic": "price_basic_monthly",
+            "pro": "price_pro_monthly",
+            "enterprise": "price_enterprise_monthly"
+        }
     
     # Google OAuth - required for Google login
     GOOGLE_CLIENT_ID: str
