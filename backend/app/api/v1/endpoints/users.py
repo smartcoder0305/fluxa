@@ -1,5 +1,6 @@
 from typing import Any, List
-from fastapi import APIRouter, Depends, HTTPException, status, Body, EmailStr
+from fastapi import APIRouter, Depends, HTTPException, status, Body
+from pydantic import EmailStr
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -7,7 +8,7 @@ from app.models.user import User
 from app.schemas.user import User as UserSchema, UserUpdate, PasswordUpdate
 from app.api.v1.endpoints.auth import get_current_active_user, get_current_active_superuser
 from app.core.security import verify_password, get_password_hash
-from app.crud.crud_user import update_user
+from app.crud.crud_user import update
 
 router = APIRouter()
 
@@ -41,7 +42,7 @@ def update_user_me(
         current_user_data.full_name = full_name
     if email is not None:
         current_user_data.email = email
-    user = update_user(db=db, db_obj=current_user, obj_in=current_user_data)
+    user = update(db=db, db_obj=current_user, obj_in=current_user_data)
     return user
 
 

@@ -10,17 +10,8 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
     
-    # CORS - flexible configuration
-    BACKEND_CORS_ORIGINS: List[str] = []
-
-    @field_validator("BACKEND_CORS_ORIGINS", mode="before")
-    @classmethod
-    def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
-        if isinstance(v, str) and not v.startswith("["):
-            return [i.strip() for i in v.split(",")]
-        elif isinstance(v, (list, str)):
-            return v
-        raise ValueError(v)
+    # CORS - simple string field that can be parsed later
+    BACKEND_CORS_ORIGINS: str = ""
 
     # Database - required environment variable
     DATABASE_URL: str
@@ -28,29 +19,7 @@ class Settings(BaseSettings):
     # Stripe - required for payment functionality
     STRIPE_SECRET_KEY: str
     STRIPE_WEBHOOK_SECRET: str
-    STRIPE_PRICE_IDS: str = '{"basic": "price_basic_monthly", "pro": "price_pro_monthly", "enterprise": "price_enterprise_monthly"}'
 
-    @field_validator("STRIPE_PRICE_IDS", mode="before")
-    @classmethod
-    def parse_stripe_price_ids(cls, v: Union[str, Dict]) -> Dict:
-        if isinstance(v, dict):
-            return v
-        if isinstance(v, str):
-            try:
-                import json
-                return json.loads(v)
-            except json.JSONDecodeError:
-                # Return default if parsing fails
-                return {
-                    "basic": "price_basic_monthly",
-                    "pro": "price_pro_monthly", 
-                    "enterprise": "price_enterprise_monthly"
-                }
-        return {
-            "basic": "price_basic_monthly",
-            "pro": "price_pro_monthly",
-            "enterprise": "price_enterprise_monthly"
-        }
     
     # Google OAuth - required for Google login
     GOOGLE_CLIENT_ID: str
@@ -70,8 +39,16 @@ class Settings(BaseSettings):
 
     class Config:
         case_sensitive = True
-        env_file = ".env"
         env_file_encoding = "utf-8"
+
+    @property
+    def cors_origins(self) -> List[str]:
+        """Parse CORS origins from the string field"""
+        if not self.BACKEND_CORS_ORIGINS:
+            return []
+        
+        origins = [origin.strip() for origin in self.BACKEND_CORS_ORIGINS.split(",") if origin.strip()]
+        return origins
 
 
 settings = Settings() 
