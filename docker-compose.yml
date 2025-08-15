@@ -39,6 +39,12 @@ services:
     build: ./frontend
     ports:
       - "${FRONTEND_PORT:-5173}:5173"
+    environment:
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:8000}
+      - VITE_STRIPE_PUBLISHABLE_KEY=${VITE_STRIPE_PUBLISHABLE_KEY}
+      - VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
+      - VITE_ENABLE_DEBUG_MODE=${VITE_ENABLE_DEBUG_MODE:-true}
+      - VITE_APP_TITLE=${VITE_APP_TITLE:-Fluxa (Dev)}
     volumes:
       - ./frontend:/app
     depends_on:
